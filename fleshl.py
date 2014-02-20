@@ -22,15 +22,31 @@ class Request(object):
 			self.q_strings = self.query[self.query.index('?'):-1]
 
 		if 'POST' in self.method and self.length:
-			print "assigning post data to request"
 			wsgi_input = pull_environ('wsgi.input').read(self.length)
-			print "pulled out wsgi_input"
 			self.post_data = parse_qs(wsgi_input)
 
 	def __repr__(self):
 		return "<" + self.query + self.method + str(self.length) + \
 				", ".join(self.post_data.keys()) + ">"
 
+class Response(object):
+	def __init__(self, content=None, template=None, content_type=None, **replaces):
+		if content:
+			self.content = content
+		else:
+			self.content = render(template, **replaces)
+		if content_type:
+			self.type = content_type
+		else:
+			if "html" in template:
+				self.type = 'text/html'
+			else:
+				self.type = 'text/plain'
+		
+		if isinstance(self.content, str):
+			self.length = str(len(self.content))
+		else:
+			self.length = str(0)
 class Fleshl(object):
 	def __init__(self):
 		self.routes = {}
@@ -39,13 +55,6 @@ class Fleshl(object):
 		def wrapped(func):
 			self.routes[route] = func
 		return wrapped
-
-	def render(self, template, values):
-		tag_search = re.compile("{{ (?P=<tag>) }}")
-		'''
-		>>> tag_search.search("Lorem \{\{ Ipsum \}\}")
-		'''
-		
 
 	def run(self, environ, start_response):
 		# Run the function associated with the URL we pull from
@@ -61,9 +70,23 @@ class Fleshl(object):
 			status = '200 OK'
 		else:
 			status = '404 NOT FOUND'
-		response_headers = [('Content-Type', response[1]), 
-		('Content-Length', str(len(response[0])))] 
+		response_headers = [('Content-Type', response.type), 
+							('Content-Length', response.length)] 
 
 		start_response(status, response_headers)
-		return response[0]
+		return response.content
 
+
+def render(template=None, **replaces):	
+	if not template:
+		return None
+
+	text = ""
+	filename = "templates/" + template
+
+	with open(filename) as f:
+		text = f.read()
+		for replace in replaces.keys():
+			arg_search = re.compile("{{" + replace + "}}")
+			text = re.sub(arg_search, replaces[replace], text)
+	return text
