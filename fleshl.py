@@ -1,5 +1,6 @@
 from urlparse import parse_qs
 import re
+from wsgiref.simple_server import make_server
 
 class Request(object):
 	def __init__(self, environ):
@@ -47,6 +48,7 @@ class Response(object):
 			self.length = str(len(self.content))
 		else:
 			self.length = str(0)
+
 class Fleshl(object):
 	def __init__(self):
 		self.routes = {}
@@ -90,3 +92,7 @@ def render(template=None, **replaces):
 			arg_search = re.compile("{{" + replace + "}}")
 			text = re.sub(arg_search, replaces[replace], text)
 	return text
+
+def spin_server(host, port, app_func):
+	server = make_server(host, port, app_func)
+	return server

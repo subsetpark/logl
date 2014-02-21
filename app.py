@@ -1,5 +1,4 @@
-from fleshl import Fleshl, Response
-from wsgiref.simple_server import make_server
+from fleshl import Fleshl, Response, spin_server
 
 
 app = Fleshl()
@@ -26,5 +25,5 @@ def favicon():
 	return Response(content=open('favicon.ico').read(), content_type="image/x-icon")
 
 if __name__ == "__main__":
-	httpd = make_server('localhost', 5000, app.run)
+	httpd = spin_server('localhost', 5000, app.run)
 	httpd.serve_forever()
