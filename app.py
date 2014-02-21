@@ -20,10 +20,6 @@ def form():
 	response = Response(template="form.html", arg=readback)
 	return response
 
-@app.add_route('/favicon.ico')
-def favicon():
-	return Response(content=open('favicon.ico').read(), content_type="image/x-icon")
-
 if __name__ == "__main__":
 	httpd = spin_server('localhost', 5000, app.run)
 	httpd.serve_forever()
