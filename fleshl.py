@@ -14,8 +14,12 @@ class Request(object):
 				return environ[key]
 			except KeyError:
 				return None
+		self.query = ""
+		self.method = ""
+		self.length = 0
 
 		self.query = pull_environ('PATH_INFO')
+		self.q_string = pull_environ('QUERY_STRING')
 		self.method = pull_environ('REQUEST_METHOD').upper()
 		content_length = pull_environ('CONTENT_LENGTH')
 		if content_length:
@@ -24,16 +28,15 @@ class Request(object):
 		self.post_data = {}
 		self.q_strings = {}
 
-		if 'GET' in self.method and '?' in self.query:
-			self.q_strings = self.query[self.query.index('?'):-1]
+		if 'GET' in self.method and self.q_string:
+			self.q_strings = parse_qs(self.q_string)
 
-		if 'POST' in self.method and self.length:
+		if 'POST' in self.method:
 			wsgi_input = pull_environ('wsgi.input').read(self.length)
 			self.post_data = parse_qs(wsgi_input)
 
 	def __repr__(self):
-		return "<" + self.query + self.method + str(self.length) + \
-				", ".join(self.post_data.keys()) + ">"
+		return "<" + self.query + ", " + self.method + ", " + str(self.length) + ", " + str(self.post_data) + str(self.q_strings) + ">"
 
 class Response(object):
 	"""

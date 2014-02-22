@@ -1,0 +1,16 @@
+{{%extends base.html%}}
+{{block name}}
+A great new game
+{{endblock}}
+{{block content}}
+<h3>Good morning, player!</h3>
+Please enter your name.
+<form method="post" action="/bettergame">
+    <p>
+        <input type="text" name="username">
+        <input type="submit" value="Submit">
+    </p>
+</form>
+Your name is currently {{username}}.
+Your score is currently {{score}}.
+{{endblock}}

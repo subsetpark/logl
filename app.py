@@ -37,22 +37,36 @@ def game():
 
 @app.add_route('/bettergame')
 def better_game():
-	db = app.db_client(__name__)
+	db = app.db_client[__name__]
 	zelda = db.zelda
 	users = zelda.users
-	if app.request.method is 'POST':
-		if app.request.post_data['username']:
-			username = app.request.post_data['username']
+	name_choice = ""
+	score = 0
+	user = {}
+	
+	if 'POST' in app.request.method:
+		if 'username' in app.request.post_data:
+			name_choice = app.request.post_data['username'][0]
 		else:
-			username = 'No name'
-	if app.request.method is 'GET':
-		if app.request.q_strings['username']:
-			username = app.request.q_strings['username']
+			name_choice = ''
+	elif 'GET' in app.request.method:
+		if 'username' in app.request.q_strings:
+			name_choice = app.request.q_strings['username'][0]
 		else:
-			username = 'No name'
+			name_choice = ''
 
-	response = Response(template="bettergame.html", username=username)
+	if name_choice is not '':
+		if not users.find_one({'name': name_choice}):
+			new_user = {'name' : name_choice, 'score': 1000}
+			users.insert(new_user)
+		user = users.find_one({'name' : name_choice})
+		user['score'] += 1
+		users.save(user)
+
+		score = user['score']
+	response = Response(template="bettergame.html", username=name_choice, score=str(score))
 	return response
+
 if __name__ == "__main__":
 	httpd = spin_server('localhost', 5000, app.run)
 	httpd.serve_forever()
