@@ -31,9 +31,28 @@ def game():
 	user = users.find_one({'name':'Player'})
 	user['score'] += 1
 	users.save(user)
+	
 	response = Response(template="game.html", score=str(user['score']))
 	return response
 
+@app.add_route('/bettergame')
+def better_game():
+	db = app.db_client(__name__)
+	zelda = db.zelda
+	users = zelda.users
+	if app.request.method is 'POST':
+		if app.request.post_data['username']:
+			username = app.request.post_data['username']
+		else:
+			username = 'No name'
+	if app.request.method is 'GET':
+		if app.request.q_strings['username']:
+			username = app.request.q_strings['username']
+		else:
+			username = 'No name'
+
+	response = Response(template="bettergame.html", username=username)
+	return response
 if __name__ == "__main__":
 	httpd = spin_server('localhost', 5000, app.run)
 	httpd.serve_forever()

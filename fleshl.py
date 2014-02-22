@@ -24,7 +24,7 @@ class Request(object):
 		self.post_data = {}
 		self.q_strings = {}
 
-		if self.method is 'GET' and '?' in self.query:
+		if 'GET' in self.method and '?' in self.query:
 			self.q_strings = self.query[self.query.index('?'):-1]
 
 		if 'POST' in self.method and self.length:
