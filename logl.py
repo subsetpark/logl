@@ -63,7 +63,7 @@ class Response(object):
 		else:
 			self.length = str(0)
 
-class Fleshl(object):
+class Logl(object):
 	""" A lightweight flask clone web framework
 	"""
 	def __init__(self):

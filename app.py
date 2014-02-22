@@ -1,7 +1,7 @@
-from fleshl import Fleshl, Response, spin_server
+from logl import Logl, Response, spin_server
 
 
-app = Fleshl()
+app = Logl()
 
 @app.add_route('/')
 def index():
