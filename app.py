@@ -5,19 +5,27 @@ app = Logl()
 
 @app.add_route('/')
 def index():
-	response = Response(template="index.html", arg=app.request.query)
+	app.add_replace('query', app.request.query)
+	response = app.response(template="index.html")
 	return response
 	
 @app.add_route('/form')
 def form():	
-	if 'arg' not in app.request.post_data:
-		readback = "Give some data!"
+	if 'arg' not in app.request.post_data:	
+		app.add_replace('data', "Give some data!")
 	elif app.request.post_data['arg']:
-		readback = app.request.post_data['arg'][0]
-	else:
-		readback = "No information"
+		app.add_replace('data', app.request.post_data['arg'][0])
 	
-	response = Response(template="form.html", arg=readback)
+	response = app.response(template="form.html")
+	return response
+
+@app.add_route('/if')
+def iff():
+	app.add_con('truthy', False)
+	if 'truthy' in app.request.q_strings:
+		app.add_con('truthy', True)
+
+	response = app.response(template='if.html')
 	return response
 
 @app.add_route('/game')
@@ -31,8 +39,9 @@ def game():
 	user = users.find_one({'name':'Player'})
 	user['score'] += 1
 	users.save(user)
+	app.add_replace('score', str(user['score']))
 	
-	response = Response(template="game.html", score=str(user['score']))
+	response = app.response(template="game.html")
 	return response
 
 @app.add_route('/bettergame')
@@ -63,8 +72,9 @@ def better_game():
 		user['score'] += 1
 		users.save(user)
 
-		score = user['score']
-	response = Response(template="bettergame.html", username=name_choice, score=str(score))
+		app.add_replace('username', name_choice)
+		app.add_replace('score', str(user['score']))
+	response = app.response(template="bettergame.html")
 	return response
 
 if __name__ == "__main__":

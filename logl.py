@@ -45,11 +45,12 @@ class Response(object):
 	manually in the case of non-html stuff like favicons
 	"""
 
-	def __init__(self, content=None, template=None, content_type=None, **replaces):
+	def __init__(self, app, content=None, template=None, content_type=None):
+
 		if content:
 			self.content = content
 		else:
-			self.content = render.render(template, **replaces)
+			self.content = render.render(template, app)
 		if content_type:
 			self.type = content_type
 		else:
@@ -63,12 +64,23 @@ class Response(object):
 		else:
 			self.length = str(0)
 
+class Context(object):
+
+	def __init__(self):
+		self.cons = {}
+		self.replaces = {}
+
+	def flush(self):
+		self.cons = {}
+		self.replaces = {}
+
 class Logl(object):
 	""" A lightweight flask clone web framework
 	"""
 	def __init__(self):
 		self.routes = {}
 		self.db_client = MongoClient('localhost', 27017)
+		self.context = Context()
 
 	def add_route(self, route):
 		def wrapped(func):
@@ -83,11 +95,12 @@ class Logl(object):
 		doctest.testmod()
 		
 		self.request = Request(environ)
-		
+		self.context.flush()
+
 		# If the URL is a file that exists, use it to create a new response
 		if os.path.isfile(self.request.query[1:]):
 			with open(self.request.query[1:]) as f:
-				response = Response(content=f.read(), content_type=str(mimetypes.guess_type(self.request.query)))
+				response = Response(self, content=f.read(), content_type=str(mimetypes.guess_type(self.request.query)))
 		# Otherwise look up the route
 		else:
 			response = self.routes[self.request.query]()
@@ -101,6 +114,15 @@ class Logl(object):
 
 		start_response(status, response_headers)
 		return response.content
+
+	def response(self, **args):
+		return Response(self, **args)
+
+	def add_con(self, key, value):
+		self.context.cons[key] = value
+
+	def add_replace(self, key, value):
+		self.context.replaces[key] = value
 
 def spin_server(host, port, app_func):
 	"""
