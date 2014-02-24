@@ -1,6 +1,5 @@
 from logl import Logl, Response, spin_server
 
-
 app = Logl()
 
 @app.add_route('/')
