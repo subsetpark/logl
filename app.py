@@ -23,7 +23,7 @@ def form():
 def iff():
 	app.add_con('truthy', False)
 	if 'truthy' in app.request.q_strings:
-		app.add_con('truthy', True)
+		app.add_con('is_true', True)
 
 	response = app.response(template='if.html')
 	return response

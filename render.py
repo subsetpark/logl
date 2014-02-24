@@ -49,7 +49,7 @@ def render_conditionals(if_search, text, app):
     else:
         condition = has_conditions.group('condition')
         if condition in app.context.cons.keys() and app.context.cons[condition]:
-            text = re.sub(if_search, '(P=content)', text)
+            text = re.sub(if_search, '\g<content>', text)
             return render_conditionals(if_search, text, app)
         else:
             text = re.sub(if_search, "", text)
