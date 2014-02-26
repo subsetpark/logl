@@ -124,11 +124,11 @@ class Logl(object):
 	def add_replace(self, key, value):
 		self.context.replaces[key] = value
 
-def spin_server(host, port, app_func):
-	"""
-	A pretty useless wrapper for wsgi's make_server, so client apps
-	Don't have to import wsgi
-	"""
+	def start(self, host, port):
+		"""
+		A pretty useless wrapper for wsgi's make_server, so client apps
+		Don't have to import wsgi
+		"""
 
-	server = make_server(host, port, app_func)
-	return server
+		server = make_server(host, port, self.run)
+		server.serve_forever()
