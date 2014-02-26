@@ -3,11 +3,10 @@ import re
 extend_search = re.compile(r"{{(extends) (.*)}}")
 if_search = re.compile("{{if (?P<condition>\w+)}}(?P<content>.*?){{(else|endif)}}", re.DOTALL)
 
-def render(template, app):  
+def render(template, context):  
     """
     Render an HTML template with app context information.
     """
-
     if not template:
         return None
 
@@ -24,11 +23,11 @@ def render(template, app):
         # Run conditional checks
         has_conditions = re.search(if_search, text)
         if has_conditions:
-            text = render_conditionals(text, app)
+            text = render_conditionals(text, context)
         # Replace any variables passed to the render function.
-        for replace in app.context.replaces.keys():
+        for replace in context.replaces.keys():
             arg_search = re.compile("{{ " + replace + " }}")
-            text = re.sub(arg_search, app.context.replaces[replace], text)
+            text = re.sub(arg_search, context.replaces[replace], text)
     return text
 
 def extend_template(base, text):
@@ -47,11 +46,8 @@ def extend_template(base, text):
         base = re.sub("{{block "+has_blocks.group(2)+"}}", content, base)
         return extend_template(base, text)
 
-def render_conditionals(text, app):
-    """
-    Render if/else conditional blocks
-    """
-    
+
+def render_conditionals(text, context):
     if_block_search = re.compile("{{if.*?endif}}", re.DOTALL)
     if_matches = if_block_search.finditer(text)
     else_content_search = re.compile("{{else}}(?P<content>.*?){{endif}}", re.DOTALL)
@@ -65,8 +61,7 @@ def render_conditionals(text, app):
         con_check = if_parse.group('condition')
         # The string between the {{if}} and the {{endif}} or {{else}}
         content = if_parse.group('content')
-
-        if con_check in app.context.cons.keys() and app.context.cons[con_check]:
+        if con_check in context.cons and context.cons[con_check]:
             text = re.sub(if_block, content, text)
         elif '{{else}}' in if_block:
             else_content = else_content_search.search(if_block).group('content')

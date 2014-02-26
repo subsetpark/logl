@@ -1,4 +1,4 @@
-from logl import Logl, Response, spin_server
+from logl import Logl, Response
 
 app = Logl()
 
@@ -98,5 +98,4 @@ def better_game():
 	return response
 
 if __name__ == "__main__":
-	httpd = spin_server('localhost', 5000, app.run)
-	httpd.serve_forever()
+	app.start('localhost', 5000)
