@@ -23,11 +23,11 @@ class Request(object):
 		self.post_data = {}
 		self.q_strings = {}
 
-		if 'GET' in self.method and self.q_string:
+		if self.method == 'GET' and self.q_string:
 			self.q_strings = parse_qs(self.q_string)
 
-		if 'POST' in self.method:
-			wsgi_input = environ.get('wsgi.input').read(self.length)
+		if self.method == 'POST':
+			wsgi_input = environ['wsgi.input'].read(self.length)
 			self.post_data = parse_qs(wsgi_input)
 
 	def __repr__(self):
@@ -40,12 +40,12 @@ class Response(object):
 	manually in the case of non-html stuff like favicons
 	"""
 
-	def __init__(self, app, content=None, template=None, content_type=None):
+	def __init__(self, context, content=None, template=None, content_type=None):
 
 		if content:
 			self.content = content
 		else:
-			self.content = render.render(template, app)
+			self.content = render.render(template, context)
 		if content_type:
 			self.type = content_type
 		else:
@@ -111,7 +111,7 @@ class Logl(object):
 		return response.content
 
 	def response(self, **args):
-		return Response(self, **args)
+		return Response(self.context, **args)
 
 	def add_con(self, key, value):
 		self.context.cons[key] = value
