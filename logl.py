@@ -1,8 +1,14 @@
 from urlparse import parse_qs
 import re, os.path, mimetypes
 from wsgiref.simple_server import make_server
-import render
 from pymongo import MongoClient
+import render
+
+"""
+A very simple web framework modelled on Flask. It features routing and template
+rendering with conditional logic and base extension, as well as MongoDB access. 
+Do not use this to make an actual website; it will be awful.
+"""
 
 class Request(object):
 	"""

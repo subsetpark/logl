@@ -2,11 +2,12 @@ import re
 
 extend_search = re.compile(r"{{(extends) (.*)}}")
 if_search = re.compile("{{if (?P<condition>\w+)}}(?P<content>.*?){{(else|endif)}}", re.DOTALL)
-replace_search = re.compile("{{ (?P<replace>) }}")
-else_search = re.compile("{{else}}(?P<content>.*?)(?={{endif}})", re.DOTALL)
-elseless_search = re.compile("{{if.*?endif}}", re.DOTALL)
 
 def render(template, app):  
+    """
+    Render an HTML template with app context information.
+    """
+
     if not template:
         return None
 
@@ -31,6 +32,10 @@ def render(template, app):
     return text
 
 def extend_template(base, text):
+    """
+    Extend a base template 
+    """
+
     block_search = re.compile("{{(block) (\w+)}}")
     has_blocks = re.search(block_search, base)
     if not has_blocks:
@@ -43,6 +48,10 @@ def extend_template(base, text):
         return extend_template(base, text)
 
 def render_conditionals(text, app):
+    """
+    Render if/else conditional blocks
+    """
+    
     if_block_search = re.compile("{{if.*?endif}}", re.DOTALL)
     if_matches = if_block_search.finditer(text)
     else_content_search = re.compile("{{else}}(?P<content>.*?){{endif}}", re.DOTALL)
@@ -56,9 +65,6 @@ def render_conditionals(text, app):
         con_check = if_parse.group('condition')
         # The string between the {{if}} and the {{endif}} or {{else}}
         content = if_parse.group('content')
-
-        # import pdb
-        # pdb.set_trace()
 
         if con_check in app.context.cons.keys() and app.context.cons[con_check]:
             text = re.sub(if_block, content, text)

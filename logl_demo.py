@@ -4,12 +4,18 @@ app = Logl()
 
 @app.add_route('/')
 def index():
+	"""
+	Display the requested path.
+	"""
 	app.add_replace('query', app.request.query)
 	response = app.response(template="index.html")
 	return response
 	
 @app.add_route('/form')
 def form():	
+	"""
+	Display some data that was submitted via POST.
+	"""
 	if 'arg' not in app.request.post_data:	
 		app.add_replace('data', "Give some data!")
 	elif app.request.post_data['arg']:
@@ -20,6 +26,10 @@ def form():
 
 @app.add_route('/if')
 def iff():
+	"""
+	Read two conditional values set by checkmarks and push them back into the template.
+	"""
+
 	app.add_con('first', False)
 	app.add_con('second', False)
 
@@ -28,13 +38,15 @@ def iff():
 			app.add_con('first', True)
 		if 'second' in app.request.post_data['ifs']:
 			app.add_con('second', True)
-	print app.request.post_data
 
 	response = app.response(template='if.html')
 	return response
 
 @app.add_route('/game')
 def game():
+	"""
+	Open a mongoDB database and increment a player's score every time they load the page.
+	"""
 	db = app.db_client[__name__]
 	bubble_game = db.bubble_game	
 	users = bubble_game.users
@@ -51,6 +63,9 @@ def game():
 
 @app.add_route('/bettergame')
 def better_game():
+	"""
+	Same as with the simple game, except now we track a separate score for each user.
+	"""
 	db = app.db_client[__name__]
 	zelda = db.zelda
 	users = zelda.users
