@@ -20,9 +20,15 @@ def form():
 
 @app.add_route('/if')
 def iff():
-	app.add_con('truthy', False)
-	if 'truthy' in app.request.q_strings:
-		app.add_con('is_true', True)
+	app.add_con('first', False)
+	app.add_con('second', False)
+
+	if 'ifs' in app.request.post_data:
+		if 'first' in app.request.post_data['ifs']:
+			app.add_con('first', True)
+		if 'second' in app.request.post_data['ifs']:
+			app.add_con('second', True)
+	print app.request.post_data
 
 	response = app.response(template='if.html')
 	return response

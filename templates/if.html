@@ -4,9 +4,21 @@ If page
 {{endblock}}
 {{block content}}
 <h2>This page demonstrates conditionals.</h2>
+<form method="post" action="/if">
+    <p>
+        <input type="checkbox" name="ifs" value="first">
+        <input type="checkbox" name="ifs" value="second">
+        <input type="submit" value="Submit">
+    </p>
+</form>
 <p>
-{{if is_true}}
-Congratulations!
+{{if first}}
+This is a basic if.
+{{endif}}
+{{if second}}
+This is an if with an else.
+{{else}}
+This is an else.
 {{endif}}
 </p>
 <p>
