@@ -9,19 +9,14 @@ class Request(object):
 	Provides useful request information to the web server.
 	"""
 	def __init__(self, environ):
-		def pull_environ(key):
-			try:
-				return environ[key]
-			except KeyError:
-				return None
 		self.query = ""
 		self.method = ""
 		self.length = 0
-
-		self.query = pull_environ('PATH_INFO')
-		self.q_string = pull_environ('QUERY_STRING')
-		self.method = pull_environ('REQUEST_METHOD').upper()
-		content_length = pull_environ('CONTENT_LENGTH')
+		self.query = environ.get('PATH_INFO')
+		self.q_string = environ.get('QUERY_STRING')
+		method = environ.get('REQUEST_METHOD')
+		self.method = method and method.upper()
+		content_length = environ.get('CONTENT_LENGTH')
 		if content_length:
 			self.length = int(content_length)
 
@@ -32,7 +27,7 @@ class Request(object):
 			self.q_strings = parse_qs(self.q_string)
 
 		if 'POST' in self.method:
-			wsgi_input = pull_environ('wsgi.input').read(self.length)
+			wsgi_input = environ.get('wsgi.input').read(self.length)
 			self.post_data = parse_qs(wsgi_input)
 
 	def __repr__(self):
