@@ -60,7 +60,7 @@ def render_conditionals(text, context):
         # import pdb
         # pdb.set_trace()
 
-        if con_check in context.cons.keys() and context.cons[con_check]:
+        if con_check in context.cons and context.cons[con_check]:
             text = re.sub(if_block, content, text)
         elif '{{else}}' in if_block:
             else_content = else_content_search.search(if_block).group('content')
