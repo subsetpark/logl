@@ -21,7 +21,7 @@ class Request(object):
 		self.query = environ.get('PATH_INFO')
 		self.q_string = environ.get('QUERY_STRING')
 		method = environ.get('REQUEST_METHOD')
-		self.method = method and method.upper()
+		self.method = method.upper() if method else ""
 		content_length = environ.get('CONTENT_LENGTH')
 		if content_length:
 			self.length = int(content_length)
