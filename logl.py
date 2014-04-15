@@ -75,15 +75,8 @@ class Logl(object):
 		return wrapped
 
 	def run(self, environ, start_response):
-		# Run the function associated with the URL we pull from
-		# environ
-		
-		import doctest
-		doctest.testmod()
-		
 		self.request = Request(environ)
 		self.context.flush()
-
 		# If the URL is a file that exists, use it to create a new response
 		if os.path.isfile(self.request.query[1:]):
 			with open(self.request.query[1:]) as f:
@@ -107,10 +100,5 @@ class Logl(object):
 		self.context.replaces[key] = value
 
 	def start(self, host, port):
-		"""
-		A pretty useless wrapper for wsgi's make_server, so client apps
-		Don't have to import wsgi
-		"""
-
 		server = make_server(host, port, self.run)
 		server.serve_forever()
