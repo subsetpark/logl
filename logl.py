@@ -48,10 +48,7 @@ class Response(object):
 
 	def __init__(self, context, content=None, template=None, content_type=None):
 
-		if content:
-			self.content = content
-		else:
-			self.content = render.render(template, context)
+		self.content = content if content else render.render(template, context)
 		if content_type:
 			self.type = content_type
 		else:
