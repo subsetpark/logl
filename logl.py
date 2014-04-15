@@ -15,19 +15,12 @@ class Request(object):
 	Provides useful request information to the web server.
 	"""
 	def __init__(self, environ):
-		self.query = ""
-		self.method = ""
-		self.length = 0
 		self.query = environ.get('PATH_INFO')
 		self.q_string = environ.get('QUERY_STRING')
 		method = environ.get('REQUEST_METHOD')
 		self.method = method.upper() if method else ""
 		content_length = environ.get('CONTENT_LENGTH')
-		if content_length:
-			self.length = int(content_length)
-
-		self.post_data = {}
-		self.q_strings = {}
+		self.length = int(content_length) if content_length else 0
 
 		if self.method == 'GET' and self.q_string:
 			self.q_strings = parse_qs(self.q_string)
@@ -56,11 +49,7 @@ class Response(object):
 				self.type = 'text/html'
 			else:
 				self.type = 'text/plain'
-		
-		if isinstance(self.content, str):
-			self.length = str(len(self.content))
-		else:
-			self.length = str(0)
+		self.length = str(len(self.content)) if isinstance(self.content, str) else "0"
 
 class Context(object):
 
@@ -102,14 +91,9 @@ class Logl(object):
 		# Otherwise look up the route
 		else:
 			response = self.routes[self.request.query]()
-
-		if response:
-			status = '200 OK'
-		else:
-			status = '404 NOT FOUND'
+		status = '200 OK' if response else '404 NOT FOUND'
 		response_headers = [('Content-Type', response.type), 
 							('Content-Length', response.length)] 
-
 		start_response(status, response_headers)
 		return response.content
 
