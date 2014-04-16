@@ -33,7 +33,7 @@ def iff():
 	app.add_con('first', False)
 	app.add_con('second', False)
 
-	if 'ifs' in app.request.post_data:
+	if app.request.method == "POST" and 'ifs' in app.request.post_data:
 		if 'first' in app.request.post_data['ifs']:
 			app.add_con('first', True)
 		if 'second' in app.request.post_data['ifs']:
